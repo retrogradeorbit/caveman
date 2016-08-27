@@ -211,20 +211,20 @@
           level (make-field)
           level-batch (js/PIXI.ParticleContainer.)
 
-          state {:breeding 0
-                 :warmth 0
-                 :happiness 0
-                 :night-attack 0.01
-                 :resiliance 0
-                 :speed 0
-                 :distance 0
-                 :trade 0
-                 :population 1
-                 :defence 0
-                 :health 0
+          start-state {:breeding 0
+                       :warmth 0
+                       :happiness 0
+                       :night-attack 0.1
+                       :resiliance 0
+                       :speed 0
+                       :distance 0
+                       :trade 0
+                       :population 1
+                       :defence 0
+                       :health 0
 
-                 :food 1
-                 :thoughts 0}
+                       :food 1
+                       :thoughts 0}
           ]
       (add-tiles! level-batch tileset level)
 
@@ -238,13 +238,18 @@
         (set! (.-mousedown main) )
         (s/set-pos! main -1000 -1000)
         (s/set-scale! main 4)
+        (s/set-pos! background -1000 -1000)
 
-        (let [mode (<! (survive-or-think))]
+        (loop [mode (<! (survive-or-think))
+               state start-state]
+          (<! (timeout 1000))
+
+          (let [night-attack? (< (rand) (:night-attack state))]
+            (when night-attack? (log "you were attacked in the night"))
 
 
-
+            (recur
+             (<! (survive-or-think))
+             state))
           )
-        (loop []
-          (s/set-pos! background -1000 -1000)
-          (<! (e/next-frame))
-          (recur))))))
+        ))))
