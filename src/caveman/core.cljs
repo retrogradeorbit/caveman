@@ -14,7 +14,7 @@
             [infinitelives.utils.console :refer [log]]
             [cljs.core.match :refer-macros [match]]
 
-            [cljs.core.async :refer [<! chan put!]] )
+            [cljs.core.async :refer [<! chan put! timeout]] )
   (:require-macros [cljs.core.async.macros :refer [go]]
                    [infinitelives.pixi.macros :as m]
                    [infinitelives.pixi.pixelfont :as pf]
@@ -90,39 +90,84 @@
 (defn make-window [w h & {:keys [handle mousedown] :or {handle :center}}]
   (let [window (js/PIXI.Container.)
         w-1 (dec w)
-        h-1 (dec h)]
-    (doall
-     (for [x (range w)
-           y (range h)]
-       (let [sp (s/make-sprite
+        h-1 (dec h)
+        top-left (t/get-texture :top-left)
+        top-right (t/get-texture :top-right)
+        bottom-left (t/get-texture :bottom-left)
+        bottom-right (t/get-texture :bottom-right)
+        left (t/get-texture :left)
+        right (t/get-texture :right)
+        bottom (t/get-texture :bottom)
+        top (t/get-texture :top)
+        center (t/get-texture :center)]
+
+    (assert (= (.-width top-left)
+               (.-width left)
+               (.-width bottom-left)) "left edge tiles are not equal width")
+    (assert (= (.-width top)
+               (.-width center)
+               (.-width bottom)) "center vertical strip of tiles are not equal width")
+    (assert (= (.-width top-right)
+               (.-width right)
+               (.-width bottom-right)) "right edge tiles are not equal width")
+
+    (assert (= (.-height top-left)
+               (.-height top)
+               (.-height top-right)) "top edge tiles are not equal height")
+    (assert (= (.-height left)
+               (.-height center)
+               (.-height right)) "center horizontal strip of tiles are not equal height")
+    (assert (= (.-height bottom-left)
+               (.-height bottom)
+               (.-height bottom-right)) "bottom edge tiles are not equal height")
+
+    (let [left-width (.-width left)
+          center-width (.-width center)
+          right-width (.-width right)
+          top-height (.-height top)
+          center-height (.-height center)
+          bottom-height (.-height bottom)
+          total-width (+ left-width (* center-width (- w 2)) right-width)
+          total-height (+ top-height (* center-height (- h 2)) bottom-height)
+
+          ]
+
+      (doall
+       (for [x (range w)
+             y (range h)]
+         (let [sp (s/make-sprite
                    (match [x y]
-                          [0 0] :top-left
-                          [w-1 0] :top-right
-                          [0 h-1] :bottom-left
-                          [w-1 h-1] :bottom-right
-                          [0 _] :left
-                          [_ 0] :top
-                          [w-1 _] :right
-                          [_ h-1] :bottom
-                          :else :center)
-                   :x (* 16 x)
-                   :y (* 16 y)
+                          [0 0] top-left
+                          [w-1 0] top-right
+                          [0 h-1] bottom-left
+                          [w-1 h-1] bottom-right
+                          [0 _] left
+                          [_ 0] top
+                          [w-1 _] right
+                          [_ h-1] bottom
+                          :else center)
+                   :x (match x
+                             0 0
+                             _ (+ left-width (* center-width (dec x))))
+
+                   :y (match y
+                             0 0
+                             _ (+ top-height (* center-height (dec y))))
                    :xhandle 0
                    :yhandle 0)]
-         (when mousedown
-           (set! (.-interactive sp) true)
-           (set! (.-mousedown sp) mousedown))
-         (.addChild window sp))))
-    (when mousedown
-      (set! (.-interactiveChildren window) true))
-    (s/set-scale! window 4)
-    (apply s/set-pivot! window
-           (case handle
-             :center [(* 8 w) (* 8 h)]
-             :top-right [(* 16 w) 0]
-             :top-left [0 0]))
-    window
-    ))
+           (when mousedown
+             (set! (.-interactive sp) true)
+             (set! (.-mousedown sp) mousedown))
+           (.addChild window sp))))
+      (when mousedown
+        (set! (.-interactiveChildren window) true))
+      (s/set-scale! window 4)
+      (apply s/set-pivot! window
+             (case handle
+               :center [(/ total-width 2) (/ total-height 2)]
+               :top-right [total-width 0]
+               :top-left [0 0]))
+      window)))
 
 (defn make-action-window [t & opts]
   (let [window (apply make-window 8 4 opts)
