@@ -291,6 +291,31 @@ void main() {
 "
 
 )
+
+(defn change-text! [batch font-key text]
+  (let [font (pf/get-font font-key)]
+    (loop [[c & l] (seq text)
+           xp 0 yp 0
+           last-c nil]
+      (let [char ((:font font) c)
+            {:keys [texture pos size]} char
+            [x y] pos
+            [w h] size
+            pair (str last-c c)
+            koff ((:kerning font) pair)
+            ]
+        (if (nil? char)
+          ;; if character is not present in font map, put a space
+          (when (seq l)
+            (recur l (+ xp (:space font)) yp c))
+
+          (do
+            ;character is present, add the sprite to the container
+            (.addChild batch (s/make-sprite texture :x (+ xp koff) :y yp :xhandle 0 :yhandle 0))
+            (if (seq l)
+              (recur l (+ xp w 1.0 koff) yp c)
+              (s/set-pivot! batch (/ (+ xp w koff) 2.0) 0))))))))
+
 (defonce main
   (go
     (<! (r/load-resources canvas :ui ["img/sprites.png"
