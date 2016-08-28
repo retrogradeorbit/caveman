@@ -316,6 +316,18 @@ void main() {
               (recur l (+ xp w 1.0 koff) yp c)
               (s/set-pivot! batch (/ (+ xp w koff) 2.0) 0))))))))
 
+(defn lightmap-filter [lightmap ambient resolution alpha fire]
+  (js/PIXI.AbstractFilter.
+   nil
+   ;#js [vertex-glsl]
+   #js [fragment-shader-glsl]
+   #js {
+        "u_lightmap" #js {"type" "sampler2D" "value" lightmap}
+        "alpha" #js {"type" "1f" "value" alpha}
+        "fire" #js {"type" "1f" "value" fire}
+        "resolution" #js {"type" "2f" "value" (js/Float32Array. resolution)}
+        "ambientColor" #js {"type" "4f" "value" (js/Float32Array. ambient)}}))
+
 (defonce main
   (go
     (<! (r/load-resources canvas :ui ["img/sprites.png"
@@ -336,47 +348,237 @@ void main() {
               (:empty tileset)
               2000 2000)
           level (make-field)
-          level-batch (js/PIXI.ParticleContainer.)
+          level-batch (js/PIXI.Container.) ;; ParticleContainer cant have filters applies
 
-          start-state {:breeding 0
-                       :warmth 0
-                       :happiness 0
-                       :night-attack 0.1
-                       :resiliance 0
-                       :speed 0
-                       :distance 0
-                       :trade 0
+          state (atom {
+                       :fire false
+                       :night-attack 0.15
                        :population 1
                        :defence 0
-                       :health 0
 
-                       :food 1
-                       :thoughts 0}
+                       :food 10
+                       :life 100
+                       :love 0
+                       :thoughts 0})
           ]
       (add-tiles! level-batch tileset level)
 
+      (let [player (s/make-sprite :caveman :scale 4)
+            player-batch (js/PIXI.Container.)
 
-      (m/with-sprite canvas :bg
-        [background bg
-         main level-batch
-         player (s/make-sprite :caveman :scale 4)
-         ]
-        (set! (.-interactive main) true)
-        (set! (.-mousedown main) )
-        (s/set-pos! main -1000 -1000)
-        (s/set-scale! main 4)
-        (s/set-pos! background -1000 -1000)
+            dark-filter-level (lightmap-filter
+                               (r/get-texture :light :nearest)
+                               #js  [0 0 0 0.5]
+                               #js  [1.0 1.0]
+                               0.0 0.0)
 
-        (loop [mode (<! (survive-or-think))
-               state start-state]
-          (<! (timeout 1000))
+            dark-filter-sprites (lightmap-filter
+                                 (r/get-texture :light :nearest)
+                                 #js  [0 0 0 0.5]
+                                 #js  [1.0 1.0]
+                                 0.0 0.0)
 
-          (let [night-attack? (< (rand) (:night-attack state))]
-            (when night-attack? (log "you were attacked in the night"))
+            sunset (fn [fire-state]
+                     (go
+                       (loop [f 0]
+                         (set! (.-uniforms.alpha.value dark-filter-level)
+                               (Math/sin (/ f 60)))
+                         (set! (.-uniforms.fire.value dark-filter-level)
+                               (if fire-state
+                                 (Math/sin (/ f 60))
+                                 0))
+                         (set! (.-uniforms.alpha.value dark-filter-sprites)
+                               (if fire-state 0 (Math/sin (/ f 60))))
+
+                         (<! (e/next-frame))
+                         (when (< f 60)
+                           (recur (inc f))))))
+
+            sunrise (fn [fire-state]
+                      (go
+                        (loop [f 60]
+                          (set! (.-uniforms.alpha.value dark-filter-level)
+                                (Math/sin (/ f 60)))
+                          (set! (.-uniforms.fire.value dark-filter-level)
+                                (if fire-state
+                                  (Math/sin (/ f 60))
+                                  0))
+                          (set! (.-uniforms.alpha.value dark-filter-sprites)
+                                (if fire-state 0 (Math/sin (/ f 60))))
+                          (<! (e/next-frame))
+                          (when (pos? f)
+                            (recur (dec f)))))
+                      )
+
+            inventions (js/PIXI.Container.)
+
+            ]
+        (.addChild player-batch player)
+
+        (m/with-sprite canvas :inventions
+          [inventions inventions]
+
+          (m/with-sprite canvas :stats
+            [food (s/make-sprite :food :scale 4 :x 50 :y 50)
+             food-text (pf/make-text :small (str (:food @state)) :scale 4 :y 35 :x 100)
+
+             life (s/make-sprite :health :scale 4 :x 50 :y 110)
+             life-text (pf/make-text :small (str (:life @state)) :scale 4 :y 95 :x 120)
+
+             love (s/make-sprite :heart :scale 4 :x 50 :y 170)
+             love-text (pf/make-text :small (str (:love @state)) :scale 4 :y 155 :x 100)
+             ]
+
+            (go
+              (loop [food-num (:food @state)]
+                (<! (e/next-frame))
+                (when (not= (:food @state) food-num)
+                  ;; change food num
+                  (.removeChildren food-text)
+                  (change-text! food-text :small (str (:food @state)))
+                  )
+                (recur (:food @state))))
+
+            (go
+              (loop [life-num (:life @state)]
+                (<! (e/next-frame))
+                (when (not= (:life @state) life-num)
+                  ;; change life num
+                  (.removeChildren life-text)
+                  (change-text! life-text :small (str (:life @state)))
+                  )
+                (recur (:life @state))))
 
 
-            (recur
-             (<! (survive-or-think))
-             state))
-          )
-        ))))
+            (m/with-sprite canvas :bg
+              [background bg
+               main level-batch
+               sprite-batch player-batch
+               ]
+
+                                        ;(set! (.-blendMode dark-filter) js/PIXI.BLEND_MODES.ADD)
+              (set! (.-filters main) (make-array dark-filter-level))
+              (set! (.-filters sprite-batch) (make-array dark-filter-sprites))
+
+              (set! (.-interactive main) true)
+              (set! (.-mousedown main) )
+              (s/set-pos! main -1000 -1000)
+              (s/set-scale! main 4)
+              (s/set-pos! background -1000 -1000)
+
+              (loop [mode (<! (survive-or-think))]
+
+                #_ (when (= :think mode)
+                     (swap! state update-in [:thoughts] inc))
+
+                (log (clj->js @state))
+
+                (when (:fire @state)
+                  (s/set-texture! (:fire-sprite @state) :fire))
+                (<! (sunset (:fire @state)))
+                (<! (timeout 1000))
+                (<! (sunrise (:fire @state)))
+                (when (:fire @state)
+                  (s/set-texture! (:fire-sprite @state) :fire-place))
+
+                ;; invention?
+                (when (= :think mode)
+                  (log "1" (:thoughts @state))
+                  (when (= 2 (:thoughts @state))
+                    (log "2")
+                    (sound/play-sound :blop 0.5 false)
+                    (add-shelter! sprite-batch -48 0)
+                    (<! (pop-up
+                         [:lines
+                          [:line
+                           [:white "New Invention!"]]
+
+                          [:line
+                           [:black "Last night you invented"]]
+                          [:line
+                           [:brown "SHELTER"]]]))
+                    (.addChild inventions
+                               (s/make-sprite :shelter :scale 4 :x -50 :y 50))
+                    )
+
+                  (when (= 4 (:thoughts @state))
+                    (sound/play-sound :blop 0.5 false)
+
+
+                    (swap! state assoc
+                           :fire true
+                           :fire-sprite (add-fire! sprite-batch 32 0))
+                    (<! (pop-up
+                         [:lines
+                          [:line
+                           [:white "New Invention!"]]
+
+                          [:line
+                           [:black "Last night you invented"]]
+                          [:line
+                           [:yellow "FIRE"]]]))
+                    (.addChild inventions
+                               (s/make-sprite :fire :scale 4 :x -50 :y 140))
+                    ))
+
+                (let [night-attack? (< (rand) (:night-attack @state))]
+                  (if night-attack?
+
+                    ;; attacked
+                    (do (<!
+                         (pop-up
+                          [:lines
+                           [:line
+                            [:white "Night Attack!"]]
+
+                           [:line
+                            [:black "You were attacked in the night by"]]
+                           [:line
+                            [:blue "NIGHT WOLVES"]]
+                           ]))
+
+                        (swap! state update-in [:life] - 25)
+                        )
+
+
+
+                    ;; not attacked
+                    (case mode
+                      :survive
+                      (when (< (rand) 0.3)
+
+                        (<!
+                         (pop-up
+                          [:lines
+                           [:line
+                            [:white "Food!"]]
+
+                           [:line
+                            [:black "You went searching at night and found"]]
+                           [:line
+                            [:yellow "BANANAS"]]
+                           ]))
+                        (swap! state update-in [:food] + 10))
+
+                      :think
+                      (when (= :think mode)
+                        (swap! state update-in [:thoughts] inc)
+                        )
+                      )
+                    )
+
+                  ;; are you dead?
+                  (if (zero? (:life @state))
+                    (do (log "dead")
+                        (s/set-texture! player :grave)
+                        (while true (<! (e/next-frame)))
+                        )
+
+                    (do
+
+                      ;; go complete. eat food
+                      (swap! state update-in [:food] dec)
+
+                      (let [action (<! (survive-or-think))]
+
+                        (recur action)))))))))))))
