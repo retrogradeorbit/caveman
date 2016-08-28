@@ -249,6 +249,17 @@
         (>! res (<! c))))
     res))
 
+(defn add-shelter! [batch x y]
+  (let [s (s/make-sprite :shelter :x x :y y :scale 4)]
+    (.addChild batch s)
+    s))
+
+(defn add-fire! [batch x y]
+  (let [s (s/make-sprite :fire-place :x x :y y :scale 4)]
+    (.addChild batch s)
+    s)
+)
+
 (defonce main
   (go
     (<! (r/load-resources canvas :ui ["img/sprites.png"
