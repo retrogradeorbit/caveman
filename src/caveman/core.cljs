@@ -182,6 +182,13 @@
                :top-left [0 0]))
       window)))
 
+(defn night-summary [text]
+  (go
+    (let [c (chan)]
+      (m/with-sprite canvas :ui
+        [window (make-window 12 2 :mousedown #(close! c))
+         text-sprite (pf/make-text :small text :scale 4 :tint 0x000000 :y -10)]
+        (<! c)))))
 (defn make-action-window [t & opts]
   (let [window (apply make-window 8 4 opts)
         text (pf/make-text :small "Survive" :scale 4)]
