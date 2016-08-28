@@ -189,6 +189,44 @@
         [window (make-window 12 2 :mousedown #(close! c))
          text-sprite (pf/make-text :small text :scale 4 :tint 0x000000 :y -10)]
         (<! c)))))
+
+(defn pop-up [markup]
+  (go
+    (let [c (chan)]
+      (m/with-sprite canvas :ui
+        [window (make-window 14 4 :mousedown #(close! c))
+                                        ;text-sprite (pf/make-text :small text :scale 4 :tint 0x000000 :y -10)
+         ]
+        (s/set-pos! window 0 200)
+        (m/with-sprite-set canvas :ui
+          [lines
+           (->
+            (let [[name & args] markup]
+              (case name
+                :lines
+                (for [[lnum [lname & largs]] (map vector (range) args)]
+                  (case lname
+                    :line
+                    (for [[cname & [text]] largs]
+                      (pf/make-text :small text :scale 4
+                                    :tint (case cname
+                                            :white 0xffffff
+                                            :yellow 0xffff00
+                                            :red 0xff0000
+                                            :black 0x000000
+                                            :brown 0x804000
+                                            :blue 0x000080)
+                                    :x 0 :y (+ 200 (* -1 12 4) (* 12 4 lnum))
+                                    )
+                      )
+                    )
+                  )
+                ))
+
+            flatten)]
+          (<! c))))))
+
+
 (defn make-action-window [t & opts]
   (let [window (apply make-window 8 4 opts)
         text (pf/make-text :small "Survive" :scale 4)]
