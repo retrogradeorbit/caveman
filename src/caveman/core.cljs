@@ -240,10 +240,12 @@
         res (chan)]
     (go
       (m/with-sprite canvas :ui
-        [window-left (make-window 8 4 :handle :top-right :mousedown #(put! c :survive))
-         window-right (make-window 8 4 :handle :top-left :mousedown #(put! c :think))
-         text-left (pf/make-text :small "Survive" :scale 4 :x -250 :y 190 :tint 0x000000)
-         text-right (pf/make-text :small "Think" :scale 4 :x 250 :y 190 :tint 0x000000)]
+        [window-left (make-window 8 2 :handle :top-right :mousedown #(put! c :survive))
+         window-right (make-window 8 2 :handle :top-left :mousedown #(put! c :think))
+         text-left (pf/make-text :small "Survive" :scale 4 :x -250 :y 152 :tint 0x000000)
+         text-right (pf/make-text :small "Think" :scale 4 :x 250 :y 152 :tint 0x000000)]
+        (s/set-pos! window-left 0 100)
+        (s/set-pos! window-right 0 100)
         (>! res (<! c))))
     res))
 
