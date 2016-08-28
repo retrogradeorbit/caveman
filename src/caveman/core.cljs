@@ -331,7 +331,9 @@ void main() {
 (defonce main
   (go
     (<! (r/load-resources canvas :ui ["img/sprites.png"
-                                      "img/fonts.png"]
+                                      "img/fonts.png"
+                                      "img/light.png"
+                                      "sfx/blop.ogg"]
                           :full-colour 0xa8c032))
 
     (pf/pixel-font :small "img/fonts.png" [5 5] [250 60]
