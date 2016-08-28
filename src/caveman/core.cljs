@@ -37,7 +37,19 @@
 
 (def spritesheet
   {:fire-place {:pos [48 0] :size [16 16]}
+   :fire {:pos [48 64] :size [16 16]}
    :caveman {:pos [64 0] :size [16 16]}
+   :shelter {:pos [64 16] :size [16 16]}
+   :food {:pos [48 48] :size [16 16]}
+   :heart {:pos [96 16] :size [16 16]}
+   :wheel {:pos [80 16] :size [16 16]}
+   :flame {:pos [80 32] :size [16 16]}
+   :club {:pos [48 32] :size [16 16]}
+   :pets {:pos [48 16] :size [16 16]}
+   :religion {:pos [112 16] :size [16 16]}
+   :health {:pos [129 16] :size [16 16]}
+   :grave {:pos [80 48] :size [16 16]}
+
    :top-left {:pos [144 16] :size [16 16]}
    :top {:pos [160 16] :size [16 16]}
    :top-right {:pos [176 16] :size [16 16]}
@@ -46,8 +58,7 @@
    :right {:pos [176 32] :size [16 16]}
    :bottom-left {:pos [144 48] :size [16 16]}
    :bottom {:pos [160 48] :size [16 16]}
-   :bottom-right {:pos [176 48] :size [16 16]}
-   })
+   :bottom-right {:pos [176 48] :size [16 16]}})
 
 (def tilesheet
   {:size [16 16]
