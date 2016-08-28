@@ -29,9 +29,11 @@
 (def grass-colour 0x577543)
 
 (defonce canvas
-  (c/init {:layers [:bg :level :things :ui]
+  (c/init {:layers [:bg :level :things :stats :inventions :ui]
            :background grass-colour
-           :expand true}))
+           :expand true
+           :origins {:stats :top-left
+                     :inventions :top-right}}))
 
 (def spritesheet
   {:fire-place {:pos [48 0] :size [16 16]}
