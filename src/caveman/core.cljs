@@ -14,7 +14,7 @@
             [infinitelives.utils.console :refer [log]]
             [cljs.core.match :refer-macros [match]]
 
-            [cljs.core.async :refer [<! chan put! timeout]] )
+            [cljs.core.async :refer [<! chan put! timeout close!]] )
   (:require-macros [cljs.core.async.macros :refer [go]]
                    [infinitelives.pixi.macros :as m]
                    [infinitelives.pixi.pixelfont :as pf]
