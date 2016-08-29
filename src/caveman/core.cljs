@@ -202,7 +202,7 @@
   (go
     (let [c (chan)]
       (m/with-sprite canvas :ui
-        [window (make-window 14 4 :mousedown #(close! c))
+        [window (make-window 14 6 :mousedown #(close! c))
                                         ;text-sprite (pf/make-text :small text :scale 4 :tint 0x000000 :y -10)
          ]
         (s/set-pos! window 0 200)
