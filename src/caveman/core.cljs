@@ -454,11 +454,54 @@ void main() {
         )))
 
   )
+
+(defn do-night-attack [state mode]
+  (go
+    (if (and (:club @state) (< (rand) 0.5))
+      ;; eaten via club
+      (let [sub-to-zero (fn [val take]
+                          (max 0 (- val (if (= :survive mode)
+                                          take
+                                          (* 1.2 take)))))
+            {:keys [damage]} @state
+            [color name func arg]
+            (rand-nth
+             [
+              [:blue "NIGHTWOLF" sub-to-zero (* damage 15)]
+              [:blue "BEAR" sub-to-zero (* damage 15)]
+              [:red "BLOODBAT" sub-to-zero (* damage 10)]
+              [:green "LEACHES" sub-to-zero (* damage 5)]])
+            ]
+        (<!
+         (night-attack-eaten [color name]))
+        (swap! state update-in [:food] + 20))
+
+      ;; attacked!
+      (let [sub-to-zero (fn [val take]
+                          (max 0 (- val (if (= :survive mode)
+                                          take
+                                          (* 1.2 take)))))
+            {:keys [damage]} @state
+            [color name func arg]
+            (rand-nth
+             [
+              [:blue "NIGHTWOLF" sub-to-zero (* damage 20)]
+              [:blue "BEAR" sub-to-zero (* damage 20)]
+              [:red "BLOODBAT" sub-to-zero (* damage 15)]
+              [:green "LEACHES" sub-to-zero (* damage 10)]])
+            ]
+        (<!
+         (night-attack [color name]))
+        (swap! state update-in [:life] func arg)))))
+
 (defonce main
   (go
     (<! (r/load-resources canvas :ui ["img/sprites.png"
                                       "img/fonts.png"
                                       "img/light.png"
+                                      "img/u.png"
+                                      "img/g.png"
+                                      "img/h.png"
                                       "sfx/blop.ogg"]
                           :full-colour 0xa8c032))
 
