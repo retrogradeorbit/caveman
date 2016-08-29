@@ -18,13 +18,16 @@
   (:require-macros [cljs.core.async.macros :refer [go]]
                    [infinitelives.pixi.macros :as m]
                    [infinitelives.pixi.pixelfont :as pf]
+                   [caveman.async :refer [go-while continue-while]]
                    ))
 
 (enable-console-print!)
 (devtools/install!)
 
 ;(def Exception)
+
 ;(def backtrack)
+
 
 (def grass-colour 0x577543)
 
