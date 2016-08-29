@@ -472,7 +472,7 @@ void main() {
               [:blue "NIGHTWOLF" sub-to-zero (* damage 15)]
               [:blue "BEAR" sub-to-zero (* damage 15)]
               [:red "BLOODBAT" sub-to-zero (* damage 10)]
-              [:green "LEACHES" sub-to-zero (* damage 5)]])
+              [:green "LEECHES" sub-to-zero (* damage 5)]])
             ]
         (<!
          (night-attack-eaten [color name]))
