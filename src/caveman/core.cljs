@@ -339,6 +339,77 @@ void main() {
         "resolution" #js {"type" "2f" "value" (js/Float32Array. resolution)}
         "ambientColor" #js {"type" "4f" "value" (js/Float32Array. ambient)}}))
 
+(defn found-food [markup]
+  (pop-up
+   [:lines
+    [:line
+     [:white "Food!"]]
+    [:line
+     [:black "You went searching at night and found"]]
+    [:line
+     markup]
+    ]))
+
+(defn night-attack [markup]
+  (pop-up
+   [:lines
+    [:line
+     [:white "Night Attack!"]]
+    [:line
+     [:black "You were attacked in the night by"]]
+    [:line
+     markup]
+    ]))
+
+(defn night-attack-eaten [markup]
+  (pop-up
+   [:lines
+    [:line
+     [:white "Hunted!"]]
+    [:line
+     [:black "Last night you hunted"]]
+    [:line
+     markup]
+    ]))
+
+(defn invention [markup result]
+  (pop-up
+   [:lines
+    [:line
+     [:white "New Invention!"]]
+    [:line
+     [:black "Last night you invented"]]
+    [:line
+     markup]
+    [:line
+     [:black result]]]))
+
+(defn no-invention []
+  (let [[title text]
+        (rand-nth [
+                   ["Nothing!" "I really tried, but I came up with nothing"]
+                   ["My Head Hurts!" "Thinking is hard"]
+                   ["Fell Asleep" "I tried to think, but I got tired"]])]
+
+    (pop-up
+     [:lines
+      [:line
+       [:white title]]
+      [:line
+       [:black text]]])))
+
+(defn hungry []
+  (let [[title text]
+        (rand-nth [
+                   ["Hungry!" "My stomach is grumbling"]
+                   ["Food!" "As in, we need to find some."]])]
+
+    (pop-up
+     [:lines
+      [:line
+       [:white title]]
+      [:line
+       [:black text]]])))
 (defonce main
   (go
     (<! (r/load-resources canvas :ui ["img/sprites.png"
