@@ -410,6 +410,50 @@ void main() {
        [:white title]]
       [:line
        [:black text]]])))
+
+(defn set-pos [t u g h]
+  (s/set-pos! u -160 (+ (* 5 (Math/sin (/ t 10))) -300))
+  (s/set-scale! u 4.2)
+  ;(s/set-rotation! u (+ (/ (rand) 10) 0.1))
+  (s/set-pos! g 0 (+ (* 5 (Math/sin (+ 1.04 (/ t 10)))) -300))
+  (s/set-scale! g 3.4)
+  ;(s/set-rotation! g (+ (/ (rand) 10) -0.05))
+  (s/set-pos! h 140 (+ (* 5 (Math/sin (+ 2.08 (/ t 10)))) -320))
+  (s/set-scale! h 3.6)
+  ;(s/set-rotation! h (+ (/ (rand) 10) -0.2))
+)
+
+(defn titlescreen []
+  (let [clicked? (atom false)
+        click-fn (fn [ev] (reset! clicked? true))
+        ]
+    (go
+      (m/with-sprite canvas :ui
+        [ug (s/make-sprite (r/get-texture :u :nearest) :scale 4 :x -180 :y -300 ;:mousedown click-fn
+                           )
+         g (s/make-sprite (r/get-texture :g :nearest) :scale 4 :x 0 :y -300)
+         h (s/make-sprite (r/get-texture :h :nearest) :scale 4 :x 200 :y -300)
+
+         ]
+
+        (set! (.-interactive ug) true)
+        (set! (.-buttonMode ug) false)
+        (set! (.-mousedown ug) click-fn)
+        (set! (.-interactive g) true)
+        (set! (.-buttonMode g) false)
+        (set! (.-mousedown g) click-fn)
+        (set! (.-interactive h) true)
+        (set! (.-buttonMode h) false)
+        (set! (.-mousedown h) click-fn)
+
+        (loop [t 0]
+          (set-pos t ug g h)
+          (<! (e/next-frame))
+          (when (not @clicked?)
+            (recur (inc t))))
+        )))
+
+  )
 (defonce main
   (go
     (<! (r/load-resources canvas :ui ["img/sprites.png"
