@@ -4,7 +4,7 @@ A game done for Ludum Dare 36
 
 [PLAY IT NOW!](https://retrogradeorbit.github.io/caveman/)
 
-![Title screen](./screenshot-02.png)
+![Title screen](./screenshot-06.png)
 
 ## Overview
 
