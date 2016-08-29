@@ -1,10 +1,14 @@
-# caveman
+# UGH
 
-FIXME: Write a one-line description of your library/project.
+A game done for Ludum Dare 36
+
+[PLAY IT NOW!](https://retrogradeorbit.github.io/caveman/)
+
+![Title screen](./screenshot-02.png)
 
 ## Overview
 
-FIXME: Write a paragraph about the library/project and highlight its goals.
+Try and invent your way to modern society.
 
 ## Setup
 
@@ -30,7 +34,7 @@ To create a production build run:
     lein do clean, cljsbuild once min
 
 And open your browser in `resources/public/index.html`. You will not
-get live reloading, nor a REPL. 
+get live reloading, nor a REPL.
 
 ## License
 

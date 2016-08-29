@@ -490,7 +490,7 @@ void main() {
               [:blue "NIGHTWOLF" sub-to-zero (* damage 20)]
               [:blue "BEAR" sub-to-zero (* damage 20)]
               [:red "BLOODBAT" sub-to-zero (* damage 15)]
-              [:green "LEACHES" sub-to-zero (* damage 10)]])
+              [:green "LEECHES" sub-to-zero (* damage 10)]])
             ]
         (<!
          (night-attack [color name]))
@@ -525,7 +525,7 @@ void main() {
       (loop []
         (reset! state {
                        :fire false
-                       :night-attack 0.70
+                       :night-attack 0.60
                        :population 1
                        :defence 0
                        :damage 1
