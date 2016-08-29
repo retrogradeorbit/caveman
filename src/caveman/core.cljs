@@ -42,6 +42,11 @@
   {:fire-place {:pos [48 0] :size [16 16]}
    :fire {:pos [48 64] :size [16 16]}
    :caveman {:pos [64 0] :size [16 16]}
+   :caveman-2 {:pos [80 0] :size [16 16]}
+   :caveman-3 {:pos [96 0] :size [16 16]}
+   :caveman-4 {:pos [112 0] :size [16 16]}
+   :caveman-5 {:pos [128 0] :size [16 16]}
+   :caveman-6 {:pos [144 0] :size [16 16]}
    :shelter {:pos [64 16] :size [16 16]}
    :food {:pos [48 48] :size [16 16]}
    :heart {:pos [96 16] :size [16 16]}
