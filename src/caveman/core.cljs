@@ -57,6 +57,9 @@
    :religion {:pos [112 16] :size [16 16]}
    :health {:pos [129 16] :size [16 16]}
    :grave {:pos [80 48] :size [16 16]}
+   :u {:pos [32 128] :size [32 32]}
+   :g {:pos [64 128] :size [32 32]}
+   :h {:pos [96 128] :size [32 32]}
 
    :top-left {:pos [144 16] :size [16 16]}
    :top {:pos [160 16] :size [16 16]}
@@ -412,14 +415,14 @@ void main() {
        [:black text]]])))
 
 (defn set-pos [t u g h]
-  (s/set-pos! u -160 (+ (* 5 (Math/sin (/ t 10))) -300))
-  (s/set-scale! u 4.2)
+  (s/set-pos! u -125 (+ (* 5 (Math/sin (/ t 10))) -300))
+  (s/set-scale! u 5)
   ;(s/set-rotation! u (+ (/ (rand) 10) 0.1))
   (s/set-pos! g 0 (+ (* 5 (Math/sin (+ 1.04 (/ t 10)))) -300))
-  (s/set-scale! g 3.4)
+  (s/set-scale! g 5)
   ;(s/set-rotation! g (+ (/ (rand) 10) -0.05))
-  (s/set-pos! h 140 (+ (* 5 (Math/sin (+ 2.08 (/ t 10)))) -320))
-  (s/set-scale! h 3.6)
+  (s/set-pos! h 140 (+ (* 5 (Math/sin (+ 2.08 (/ t 10)))) -300))
+  (s/set-scale! h 5)
   ;(s/set-rotation! h (+ (/ (rand) 10) -0.2))
 )
 
@@ -429,10 +432,9 @@ void main() {
         ]
     (go
       (m/with-sprite canvas :ui
-        [ug (s/make-sprite (r/get-texture :u :nearest) :scale 4 :x -180 :y -300 ;:mousedown click-fn
-                           )
-         g (s/make-sprite (r/get-texture :g :nearest) :scale 4 :x 0 :y -300)
-         h (s/make-sprite (r/get-texture :h :nearest) :scale 4 :x 200 :y -300)
+        [ug (s/make-sprite :u :scale 4 :x -180 :y -300)
+         g (s/make-sprite :g :scale 4 :x 0 :y -300)
+         h (s/make-sprite :h :scale 4 :x 200 :y -300)
 
          ]
 
@@ -499,9 +501,6 @@ void main() {
     (<! (r/load-resources canvas :ui ["img/sprites.png"
                                       "img/fonts.png"
                                       "img/light.png"
-                                      "img/u.png"
-                                      "img/g.png"
-                                      "img/h.png"
                                       "sfx/blop.ogg"]
                           :full-colour 0xa8c032))
 
