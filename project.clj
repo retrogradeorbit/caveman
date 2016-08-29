@@ -48,7 +48,7 @@
                ;; lein cljsbuild once min
                {:id "min"
                 :source-paths ["src"]
-                :compiler {:output-to "resources/public/js/compiled/caveman.js"
+                :compiler {:output-to "build/js/compiled/caveman.js"
                            :main caveman.core
                            :optimizations :simple
                            :pretty-print false}}]}
