@@ -221,8 +221,11 @@
                                             :white 0xffffff
                                             :yellow 0xffff00
                                             :red 0xff0000
+                                            :orange 0xff8000
+                                            :purple 0xff00ff
                                             :black 0x000000
                                             :brown 0x804000
+                                            :green 0x008000
                                             :blue 0x000080)
                                     :x 0 :y (+ 200 (* -1 12 4) (* 12 4 lnum))
                                     )
