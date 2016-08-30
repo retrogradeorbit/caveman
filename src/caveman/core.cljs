@@ -178,10 +178,9 @@
                              0 0
                              _ (+ top-height (* center-height (dec y))))
                    :xhandle 0
-                   :yhandle 0)]
-           (when mousedown
-             (set! (.-interactive sp) true)
-             (set! (.-mousedown sp) mousedown))
+                   :yhandle 0
+                   :mousedown mousedown)]
+
            (.addChild window sp))))
       (when mousedown
         (set! (.-interactiveChildren window) true))
@@ -432,21 +431,10 @@ void main() {
         ]
     (go
       (m/with-sprite :ui
-        [ug (s/make-sprite :u :scale 4 :x -180 :y -300)
-         g (s/make-sprite :g :scale 4 :x 0 :y -300)
-         h (s/make-sprite :h :scale 4 :x 200 :y -300)
-
+        [ug (s/make-sprite :u :scale 4 :x -180 :y -300 :mousedown click-fn)
+         g (s/make-sprite :g :scale 4 :x 0 :y -300 :mousedown click-fn)
+         h (s/make-sprite :h :scale 4 :x 200 :y -300 :mousedown click-fn)
          ]
-
-        (set! (.-interactive ug) true)
-        (set! (.-buttonMode ug) false)
-        (set! (.-mousedown ug) click-fn)
-        (set! (.-interactive g) true)
-        (set! (.-buttonMode g) false)
-        (set! (.-mousedown g) click-fn)
-        (set! (.-interactive h) true)
-        (set! (.-buttonMode h) false)
-        (set! (.-mousedown h) click-fn)
 
         (loop [t 0]
           (set-pos t ug g h)
@@ -631,7 +619,7 @@ void main() {
                 (set! (.-filters sprite-batch) (make-array dark-filter-sprites))
 
                 (set! (.-interactive main) true)
-                                        ;(set! (.-mousedown main) )
+
                 (s/set-pos! main -1000 -1000)
                 (s/set-scale! main 4)
                 (s/set-pos! background -1000 -1000)
