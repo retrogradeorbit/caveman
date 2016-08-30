@@ -196,7 +196,7 @@
 (defn night-summary [text]
   (go
     (let [c (chan)]
-      (m/with-sprite canvas :ui
+      (m/with-sprite :ui
         [window (make-window 12 2 :mousedown #(close! c))
          text-sprite (pf/make-text :small text :scale 4 :tint 0x000000 :y -10)]
         (<! c)))))
@@ -204,12 +204,12 @@
 (defn pop-up [markup]
   (go
     (let [c (chan)]
-      (m/with-sprite canvas :ui
+      (m/with-sprite :ui
         [window (make-window 14 6 :mousedown #(close! c))
                                         ;text-sprite (pf/make-text :small text :scale 4 :tint 0x000000 :y -10)
          ]
         (s/set-pos! window 0 200)
-        (m/with-sprite-set canvas :ui
+        (m/with-sprite-set :ui
           [lines
            (->
             (let [[name & args] markup]
@@ -253,7 +253,7 @@
         ;; TODO: investigate this use case
         res (chan)]
     (go
-      (m/with-sprite canvas :ui
+      (m/with-sprite :ui
         [window-left (make-window 8 2 :handle :top-right :mousedown #(put! c :survive))
          window-right (make-window 8 2 :handle :top-left :mousedown #(put! c :think))
          text-left (pf/make-text :small "Survive" :scale 4 :x -250 :y 152 :tint 0x000000)
@@ -431,7 +431,7 @@ void main() {
         click-fn (fn [ev] (reset! clicked? true))
         ]
     (go
-      (m/with-sprite canvas :ui
+      (m/with-sprite :ui
         [ug (s/make-sprite :u :scale 4 :x -180 :y -300)
          g (s/make-sprite :g :scale 4 :x 0 :y -300)
          h (s/make-sprite :h :scale 4 :x 200 :y -300)
@@ -588,10 +588,10 @@ void main() {
 
               inventions (js/PIXI.Container.)]
           (.addChild player-batch player)
-          (m/with-sprite canvas :inventions
+          (m/with-sprite :inventions
             [inventions inventions]
 
-            (m/with-sprite canvas :stats
+            (m/with-sprite :stats
               [food (s/make-sprite :food :scale 4 :x 50 :y 50)
                food-text (pf/make-text :small (str (:food @state)) :scale 4 :y 35 :x 100)
 
@@ -620,7 +620,7 @@ void main() {
                   (recur (:life @state))))
 
 
-              (m/with-sprite canvas :bg
+              (m/with-sprite :bg
                 [background bg
                  main level-batch
                  sprite-batch player-batch
