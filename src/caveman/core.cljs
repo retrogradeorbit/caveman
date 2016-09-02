@@ -24,10 +24,7 @@
 (enable-console-print!)
 (devtools/install!)
 
-;(def Exception)
-
-;(def backtrack)
-
+(s/set-default-scale! 4)
 
 (def grass-colour 0x577543)
 
@@ -84,7 +81,7 @@
     :grass-3-r [16 32]}})
 
 (defn make-tileset []
-  (let [texture (r/get-texture :sprites :nearest)
+  (let [texture (r/get-texture :sprites)
         {:keys [size offsets]} tilesheet]
     (->> offsets
          (map (fn [[k pos]] [k (t/sub-texture texture pos size)]))
@@ -97,12 +94,10 @@
                        (rand-nth [:grass-1-l :grass-1-r :grass-2-l :grass-2-r :grass-3-l])))))))
 
 (defn add-tiles! [batch tileset tilemap]
-  ;(log tilemap)
   (doall
    (for [row (range (count tilemap))
          col (range (count (first tilemap)))]
      (let [char (get-in tilemap [row col])]
-       ;(log "add" char)
        (.addChild batch
                   (s/make-sprite (tileset char)
                                  :x (* 16 col)
@@ -197,7 +192,7 @@
     (let [c (chan)]
       (m/with-sprite :ui
         [window (make-window 12 2 :mousedown #(close! c))
-         text-sprite (pf/make-text :small text :scale 4 :tint 0x000000 :y -10)]
+         text-sprite (pf/make-text :small text :tint 0x000000 :y -10)]
         (<! c)))))
 
 (defn pop-up [markup]
@@ -205,7 +200,7 @@
     (let [c (chan)]
       (m/with-sprite :ui
         [window (make-window 14 6 :mousedown #(close! c))
-                                        ;text-sprite (pf/make-text :small text :scale 4 :tint 0x000000 :y -10)
+                                        ;text-sprite (pf/make-text :small :tint 0x000000 :y -10)
          ]
         (s/set-pos! window 0 200)
         (m/with-sprite-set :ui
@@ -218,7 +213,7 @@
                   (case lname
                     :line
                     (for [[cname & [text]] largs]
-                      (pf/make-text :small text :scale 4
+                      (pf/make-text :small text
                                     :tint (case cname
                                             :white 0xffffff
                                             :yellow 0xffff00
@@ -242,7 +237,7 @@
 
 (defn make-action-window [t & opts]
   (let [window (apply make-window 8 4 opts)
-        text (pf/make-text :small "Survive" :scale 4)]
+        text (pf/make-text :small "Survive")]
     (.addChild window text)
     window))
 
@@ -255,20 +250,20 @@
       (m/with-sprite :ui
         [window-left (make-window 8 2 :handle :top-right :mousedown #(put! c :survive))
          window-right (make-window 8 2 :handle :top-left :mousedown #(put! c :think))
-         text-left (pf/make-text :small "Survive" :scale 4 :x -250 :y 152 :tint 0x000000)
-         text-right (pf/make-text :small "Think" :scale 4 :x 250 :y 152 :tint 0x000000)]
+         text-left (pf/make-text :small "Survive" :x -250 :y 152 :tint 0x000000)
+         text-right (pf/make-text :small "Think" :x 250 :y 152 :tint 0x000000)]
         (s/set-pos! window-left 0 100)
         (s/set-pos! window-right 0 100)
         (>! res (<! c))))
     res))
 
 (defn add-shelter! [batch x y]
-  (let [s (s/make-sprite :shelter :x x :y y :scale 4)]
+  (let [s (s/make-sprite :shelter :x x :y y)]
     (.addChild batch s)
     s))
 
 (defn add-fire! [batch x y]
-  (let [s (s/make-sprite :fire-place :x x :y y :scale 4)]
+  (let [s (s/make-sprite :fire-place :x x :y y)]
     (.addChild batch s)
     s)
 )
@@ -415,15 +410,8 @@ void main() {
 
 (defn set-pos [t u g h]
   (s/set-pos! u -125 (+ (* 5 (Math/sin (/ t 10))) -300))
-  (s/set-scale! u 5)
-  ;(s/set-rotation! u (+ (/ (rand) 10) 0.1))
   (s/set-pos! g 0 (+ (* 5 (Math/sin (+ 1.04 (/ t 10)))) -300))
-  (s/set-scale! g 5)
-  ;(s/set-rotation! g (+ (/ (rand) 10) -0.05))
-  (s/set-pos! h 140 (+ (* 5 (Math/sin (+ 2.08 (/ t 10)))) -300))
-  (s/set-scale! h 5)
-  ;(s/set-rotation! h (+ (/ (rand) 10) -0.2))
-)
+  (s/set-pos! h 140 (+ (* 5 (Math/sin (+ 2.08 (/ t 10)))) -300)))
 
 (defn titlescreen []
   (let [clicked? (atom false)
@@ -431,9 +419,9 @@ void main() {
         ]
     (go
       (m/with-sprite :ui
-        [ug (s/make-sprite :u :scale 4 :x -180 :y -300 :mousedown click-fn)
-         g (s/make-sprite :g :scale 4 :x 0 :y -300 :mousedown click-fn)
-         h (s/make-sprite :h :scale 4 :x 200 :y -300 :mousedown click-fn)
+        [ug (s/make-sprite :u :x -180 :y -300 :mousedown click-fn :scale 5)
+         g (s/make-sprite :g :x 0 :y -300 :mousedown click-fn :scale 5)
+         h (s/make-sprite :h :x 200 :y -300 :mousedown click-fn :scale 5)
          ]
 
         (loop [t 0]
@@ -499,7 +487,7 @@ void main() {
                    :kerning {"fo" -2  "ro" -1 "la" -1 }
                    :space 5)
 
-    (t/load-sprite-sheet! (r/get-texture :sprites :nearest) spritesheet)
+    (t/load-sprite-sheet! (r/get-texture :sprites) spritesheet)
 
     (let [tileset (make-tileset)
           bg (js/PIXI.TilingSprite.
@@ -527,17 +515,17 @@ void main() {
                        :thoughts 0})
         (add-tiles! level-batch tileset level)
 
-        (let [player (s/make-sprite :grave :scale 4)
+        (let [player (s/make-sprite :grave)
               player-batch (js/PIXI.Container.)
 
               dark-filter-level (lightmap-filter
-                                 (r/get-texture :light :nearest)
+                                 (r/get-texture :light)
                                  #js  [0 0 0 0.5]
                                  #js  [1.0 1.0]
                                  0.0 0.0)
 
               dark-filter-sprites (lightmap-filter
-                                   (r/get-texture :light :nearest)
+                                   (r/get-texture :light)
                                    #js  [0 0 0 0.5]
                                    #js  [1.0 1.0]
                                    0.0 0.0)
@@ -580,11 +568,11 @@ void main() {
             [inventions inventions]
 
             (m/with-sprite :stats
-              [food (s/make-sprite :food :scale 4 :x 50 :y 50)
-               food-text (pf/make-text :small (str (:food @state)) :scale 4 :y 35 :x 100)
+              [food (s/make-sprite :food :x 50 :y 50)
+               food-text (pf/make-text :small (str (:food @state)) :y 35 :x 100)
 
-               life (s/make-sprite :heart :scale 4 :x 50 :y 110)
-               life-text (pf/make-text :small (str (:life @state)) :scale 4 :y 95 :x 120)
+               life (s/make-sprite :heart :x 50 :y 110)
+               life-text (pf/make-text :small (str (:life @state)) :y 95 :x 120)
                ]
 
               (go
@@ -693,7 +681,7 @@ void main() {
                               (add-shelter! sprite-batch -48 0)
                               (<! (invention [:brown "SHELTER"] "damage is halved"))
                               (.addChild inventions
-                                         (s/make-sprite :shelter :scale 4 :x -50 :y 50))
+                                         (s/make-sprite :shelter :x -50 :y 50))
                               (swap! state assoc :damage 0.5))
 
                             4
@@ -706,7 +694,7 @@ void main() {
                                      :fire-sprite (add-fire! sprite-batch 32 0))
                               (<! (invention [:yellow "FIRE"] "night attacks are rarer"))
                               (.addChild inventions
-                                         (s/make-sprite :fire :scale 4 :x -50 :y 140))
+                                         (s/make-sprite :fire :x -50 :y 140))
                               )
 
                             6
@@ -717,7 +705,7 @@ void main() {
                               (swap! state assoc :club true)
                               (<! (invention [:brown "CLUB"] "night attacks may be hunted"))
                               (.addChild inventions
-                                         (s/make-sprite :club :scale 4 :x -50 :y 230))
+                                         (s/make-sprite :club :x -50 :y 230))
                               )
 
                             8
@@ -728,7 +716,7 @@ void main() {
                               (swap! state assoc :wheel true)
                               (<! (invention [:green "WHEEL"] "trade routes open"))
                               (.addChild inventions
-                                         (s/make-sprite :wheel :scale 4 :x -50 :y 320))
+                                         (s/make-sprite :wheel :x -50 :y 320))
                               )
 
                             10
@@ -739,7 +727,7 @@ void main() {
                               (swap! state assoc :religion true)
                               (<! (invention [:purple "RELIGION"] "fear of death decreases"))
                               (.addChild inventions
-                                         (s/make-sprite :religion :scale 4 :x -50 :y 410))
+                                         (s/make-sprite :religion :x -50 :y 410))
                               )
 
                             (if (zero? (:life @state))
