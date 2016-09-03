@@ -103,7 +103,8 @@
                                  :x (* 16 col)
                                  :y (* 16 row)
                                  :xhandle 0
-                                 :yhandle 0))))))
+                                 :yhandle 0
+                                 :scale 1))))))
 
 
 (defn make-window [w h & {:keys [handle mousedown] :or {handle :center}}]
@@ -174,7 +175,8 @@
                              _ (+ top-height (* center-height (dec y))))
                    :xhandle 0
                    :yhandle 0
-                   :mousedown mousedown)]
+                   :mousedown mousedown
+                   :scale 1)]
 
            (.addChild window sp))))
       (when mousedown
@@ -319,7 +321,7 @@ void main() {
 
           (do
             ;character is present, add the sprite to the container
-            (.addChild batch (s/make-sprite texture :x (+ xp koff) :y yp :xhandle 0 :yhandle 0))
+            (.addChild batch (s/make-sprite texture :x (+ xp koff) :y yp :xhandle 0 :yhandle 0 :scale 1))
             (if (seq l)
               (recur l (+ xp w 1.0 koff) yp c)
               (s/set-pivot! batch (/ (+ xp w koff) 2.0) 0))))))))
@@ -478,7 +480,8 @@ void main() {
                                       "img/fonts.png"
                                       "img/light.png"
                                       "sfx/blop.ogg"]
-                          :full-colour 0xa8c032))
+                          :full-colour 0xa8c032
+                          :scale 1))
 
     (pf/pixel-font :small "img/fonts.png" [5 5] [250 60]
                    :chars ["ABCDEFGHIJKLMNOPQRSTUVWXYZ"
