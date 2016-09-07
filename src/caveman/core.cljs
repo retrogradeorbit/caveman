@@ -562,10 +562,10 @@ void main() {
 
             (m/with-sprite :stats
               [food (s/make-sprite :food :x 50 :y 50)
-               food-text (pf/make-text :small (str (:food @state)) :y 35 :x 100)
+               food-text (pf/make-text :small (str (:food @state)) :y 35 :x 100 :xhandle 0 :yhandle 0.5)
 
                life (s/make-sprite :heart :x 50 :y 110)
-               life-text (pf/make-text :small (str (:life @state)) :y 95 :x 120)
+               life-text (pf/make-text :small (str (:life @state)) :y 95 :x 100 :xhandle 0 :yhandle 0.5)
                ]
 
               (go
@@ -575,6 +575,7 @@ void main() {
                     ;; change food num
                     (.removeChildren food-text)
                     (change-text! food-text :small (str (max 0 (int (:food @state)))))
+                    (s/update-handle! food-text 0 0.5)
                     )
                   (recur (:food @state))))
 
@@ -585,7 +586,7 @@ void main() {
                     ;; change life num
                     (.removeChildren life-text)
                     (change-text! life-text :small (str (max 0 (int (:life @state)))))
-                    )
+                    (s/update-handle! life-text 0 0.5))
                   (recur (:life @state))))
 
 
