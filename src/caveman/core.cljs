@@ -108,8 +108,7 @@
 
 
 (defn make-window [w h & {:keys [handle mousedown] :or {handle :center}}]
-  (let [window (js/PIXI.Container.)
-        w-1 (dec w)
+  (let [w-1 (dec w)
         h-1 (dec h)
         top-left (t/get-texture :top-left)
         top-right (t/get-texture :top-right)
@@ -119,7 +118,10 @@
         right (t/get-texture :right)
         bottom (t/get-texture :bottom)
         top (t/get-texture :top)
-        center (t/get-texture :center)]
+        center (t/get-texture :center)
+        xhandle (case handle :center 0.5 :top-right 1 :top-left 0)
+        yhandle (case handle :center 0.5 :top-right 0 :top-left 0)
+        ]
 
     (assert (= (.-width top-left)
                (.-width left)
@@ -149,44 +151,37 @@
           bottom-height (.-height bottom)
           total-width (+ left-width (* center-width (- w 2)) right-width)
           total-height (+ top-height (* center-height (- h 2)) bottom-height)
+          children (for [x (range w)
+                         y (range h)]
+                     (s/make-sprite
+                      (match [x y]
+                             [0 0] top-left
+                             [w-1 0] top-right
+                             [0 h-1] bottom-left
+                             [w-1 h-1] bottom-right
+                             [0 _] left
+                             [_ 0] top
+                             [w-1 _] right
+                             [_ h-1] bottom
+                             :else center)
+                      :x (match x
+                                0 0
+                                _ (+ left-width (* center-width (dec x))))
 
-          ]
-
-      (doall
-       (for [x (range w)
-             y (range h)]
-         (let [sp (s/make-sprite
-                   (match [x y]
-                          [0 0] top-left
-                          [w-1 0] top-right
-                          [0 h-1] bottom-left
-                          [w-1 h-1] bottom-right
-                          [0 _] left
-                          [_ 0] top
-                          [w-1 _] right
-                          [_ h-1] bottom
-                          :else center)
-                   :x (match x
-                             0 0
-                             _ (+ left-width (* center-width (dec x))))
-
-                   :y (match y
-                             0 0
-                             _ (+ top-height (* center-height (dec y))))
-                   :xhandle 0
-                   :yhandle 0
-                   :mousedown mousedown
-                   :scale 1)]
-
-           (.addChild window sp))))
+                      :y (match y
+                                0 0
+                                _ (+ top-height (* center-height (dec y))))
+                      :xhandle 0
+                      :yhandle 0
+                      :mousedown mousedown
+                      :scale 1))
+          window (s/make-container children :xhandle xhandle :yhandle yhandle
+                                   :scale 4
+                                   ;:tint 0x000000
+                                   :visible true
+                                   :rotation 0 :x 0)]
       (when mousedown
         (set! (.-interactiveChildren window) true))
-      (s/set-scale! window 4)
-      (apply s/set-pivot! window
-             (case handle
-               :center [(/ total-width 2) (/ total-height 2)]
-               :top-right [total-width 0]
-               :top-left [0 0]))
       window)))
 
 (defn night-summary [text]
@@ -226,12 +221,7 @@
                                             :brown 0x804000
                                             :green 0x008000
                                             :blue 0x000080)
-                                    :x 0 :y (+ 200 (* -1 12 4) (* 12 4 lnum))
-                                    )
-                      )
-                    )
-                  )
-                ))
+                                    :x 0 :y (+ 200 (* -1 12 4) (* 12 4 lnum))))))))
 
             flatten)]
           (<! c))))))
