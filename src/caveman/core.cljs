@@ -256,8 +256,6 @@
                                   :x 250 :y 150
                                   :xhandle 0.5 :yhandle 0.5
                                   :tint 0x000000)]
-        ;(s/set-pos! window-left 0 100)
-        ;(s/set-pos! window-right 0 100)
         (>! res (<! c))))
     res))
 
