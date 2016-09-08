@@ -107,7 +107,11 @@
                                  :scale 1))))))
 
 
-(defn make-window [w h & {:keys [handle mousedown] :or {handle :center}}]
+(defn make-window [w h & {:keys [xhandle yhandle
+                                 mousedown x y]
+                          :or {xhandle 0.5
+                               yhandle 0.6
+                               x 0 y 0}}]
   (let [w-1 (dec w)
         h-1 (dec h)
         top-left (t/get-texture :top-left)
@@ -119,8 +123,6 @@
         bottom (t/get-texture :bottom)
         top (t/get-texture :top)
         center (t/get-texture :center)
-        xhandle (case handle :center 0.5 :top-right 1 :top-left 0)
-        yhandle (case handle :center 0.5 :top-right 0 :top-left 0)
         ]
 
     (assert (= (.-width top-left)
@@ -179,7 +181,7 @@
                                    :scale 4
                                    ;:tint 0x000000
                                    :visible true
-                                   :rotation 0 :x 0)]
+                                   :rotation 0 :x x :y y)]
       (when mousedown
         (set! (.-interactiveChildren window) true))
       window)))
@@ -196,10 +198,9 @@
   (go
     (let [c (chan)]
       (m/with-sprite :ui
-        [window (make-window 14 6 :mousedown #(close! c))
-                                        ;text-sprite (pf/make-text :small :tint 0x000000 :y -10)
-         ]
-        (s/set-pos! window 0 200)
+        [window (make-window 14 6 :mousedown #(close! c)
+                             :x 0 :y 50 :yhandle 0
+                             )]
         (m/with-sprite-set :ui
           [lines
            (->
@@ -221,7 +222,8 @@
                                             :brown 0x804000
                                             :green 0x008000
                                             :blue 0x000080)
-                                    :x 0 :y (+ 200 (* -1 12 4) (* 12 4 lnum))))))))
+                                    :x 0 :y (+ 240 (* -1 12 4) (* 12 4 lnum))
+                                    :xhandle 0.5 :yhandle 0))))))
 
             flatten)]
           (<! c))))))
@@ -240,10 +242,20 @@
         res (chan)]
     (go
       (m/with-sprite :ui
-        [window-left (make-window 8 2 :handle :top-right :mousedown #(put! c :survive))
-         window-right (make-window 8 2 :handle :top-left :mousedown #(put! c :think))
-         text-left (pf/make-text :small "Survive" :x -250 :y 152 :tint 0x000000)
-         text-right (pf/make-text :small "Think" :x 250 :y 152 :tint 0x000000)]
+        [window-left (make-window 8 2 :xhandle 0.5 :yhandle 0.5
+                                  :x 250 :y 150
+                                  :mousedown #(put! c :survive))
+         window-right (make-window 8 2 :xhandle 0.5 :yhandle 0.5
+                                   :x -250 :y 150
+                                   :mousedown #(put! c :think))
+         text-left (pf/make-text :small "Survive"
+                                 :x -250 :y 150
+                                 :xhandle 0.5 :yhandle 0.5
+                                 :tint 0x000000)
+         text-right (pf/make-text :small "Think"
+                                  :x 250 :y 150
+                                  :xhandle 0.5 :yhandle 0.5
+                                  :tint 0x000000)]
         ;(s/set-pos! window-left 0 100)
         ;(s/set-pos! window-right 0 100)
         (>! res (<! c))))
