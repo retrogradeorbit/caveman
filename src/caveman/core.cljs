@@ -302,30 +302,6 @@ void main() {
 
 )
 
-(defn change-text! [batch font-key text]
-  (let [font (pf/get-font font-key)]
-    (loop [[c & l] (seq text)
-           xp 0 yp 0
-           last-c nil]
-      (let [char ((:font font) c)
-            {:keys [texture pos size]} char
-            [x y] pos
-            [w h] size
-            pair (str last-c c)
-            koff ((:kerning font) pair)
-            ]
-        (if (nil? char)
-          ;; if character is not present in font map, put a space
-          (when (seq l)
-            (recur l (+ xp (:space font)) yp c))
-
-          (do
-            ;character is present, add the sprite to the container
-            (.addChild batch (s/make-sprite texture :x (+ xp koff) :y yp :xhandle 0 :yhandle 0 :scale 1))
-            (if (seq l)
-              (recur l (+ xp w 1.0 koff) yp c)
-              (s/set-pivot! batch (/ (+ xp w koff) 2.0) 0))))))))
-
 (defn lightmap-filter [lightmap ambient resolution alpha fire]
   (js/PIXI.AbstractFilter.
    nil
@@ -583,8 +559,7 @@ void main() {
                   (<! (e/next-frame))
                   (when (not= (:food @state) food-num)
                     ;; change food num
-                    (.removeChildren food-text)
-                    (change-text! food-text :small (str (max 0 (int (:food @state)))))
+                    (pf/change-text! food-text :small (str (max 0 (int (:food @state)))))
                     (s/update-handle! food-text 0 0)
                     )
                   (recur (:food @state))))
@@ -594,8 +569,7 @@ void main() {
                   (<! (e/next-frame))
                   (when (not= (:life @state) life-num)
                     ;; change life num
-                    (.removeChildren life-text)
-                    (change-text! life-text :small (str (max 0 (int (:life @state)))))
+                    (pf/change-text! life-text :small (str (max 0 (int (:life @state)))))
                     (s/update-handle! life-text 0 0))
                   (recur (:life @state))))
 
