@@ -211,19 +211,19 @@
                   (case lname
                     :line
                     (for [[cname & [text]] largs]
-                      (pf/make-text :small text
-                                    :tint (case cname
-                                            :white 0xffffff
-                                            :yellow 0xffff00
-                                            :red 0xff0000
-                                            :orange 0xff8000
-                                            :purple 0xff00ff
-                                            :black 0x000000
-                                            :brown 0x804000
-                                            :green 0x008000
-                                            :blue 0x000080)
-                                    :x 0 :y (+ 240 (* -1 12 4) (* 12 4 lnum))
-                                    :xhandle 0.5 :yhandle 0))))))
+                      (pf/appear-text :small text
+                                      :tint (case cname
+                                              :white 0xffffff
+                                              :yellow 0xffff00
+                                              :red 0xff0000
+                                              :orange 0xff8000
+                                              :purple 0xff00ff
+                                              :black 0x000000
+                                              :brown 0x804000
+                                              :green 0x008000
+                                              :blue 0x000080)
+                                      :x 0 :y (+ 240 (* -1 12 4) (* 12 4 lnum))
+                                      :xhandle 0.5 :yhandle 0))))))
 
             flatten)]
           (<! c))))))
@@ -357,7 +357,8 @@ void main() {
     [:line
      markup]
     [:line
-     [:black result]]]))
+     [:black result]]
+    ]))
 
 (defn no-invention []
   (let [[title text]
