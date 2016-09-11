@@ -759,3 +759,22 @@ void main() {
         (recur)))
 
     ))
+
+(log
+ (let [text "This is some sample text"
+       right 80
+       font-key :small
+       word-extents (vec (pf/word-beginnings-ends text))
+       num (pf/how-many-words-fit font-key text (map second word-extents) right)
+       start (-> word-extents first first)
+       end (-> num dec word-extents second)
+       section (subs text start (- end start))
+       width (pf/string-width font-key section)
+       diff (- right width)
+       num-spaces (count (re-seq #" " section))
+       padding (/ diff num-spaces)
+       line (pf/make-char-sprite-set font-key text 0x000000)
+       ]
+   section
+
+))
