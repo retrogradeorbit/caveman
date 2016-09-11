@@ -560,7 +560,9 @@ void main() {
                   (<! (e/next-frame))
                   (when (not= (:food @state) food-num)
                     ;; change food num
-                    (pf/change-text! food-text :small (str (max 0 (int (:food @state)))))
+                    (pf/change-text! food-text :small
+                                     (str (max 0 (int (:food @state))))
+                                     0xffffff)
                     (s/update-handle! food-text 0 0)
                     )
                   (recur (:food @state))))
@@ -570,7 +572,9 @@ void main() {
                   (<! (e/next-frame))
                   (when (not= (:life @state) life-num)
                     ;; change life num
-                    (pf/change-text! life-text :small (str (max 0 (int (:life @state)))))
+                    (pf/change-text! life-text :small
+                                     (str (max 0 (int (:life @state))))
+                                     0xffffff)
                     (s/update-handle! life-text 0 0))
                   (recur (:life @state))))
 
