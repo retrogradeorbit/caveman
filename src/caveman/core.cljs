@@ -725,7 +725,7 @@ void main() {
                       )
 
 
-)
+                    )
                   ;; are you dead?
                   (if (zero? (int (:life @state)))
                     (do (log "dead")
@@ -760,21 +760,35 @@ void main() {
 
     ))
 
-(log
- (let [text "This is some sample text"
-       right 80
-       font-key :small
-       word-extents (vec (pf/word-beginnings-ends text))
-       num (pf/how-many-words-fit font-key text (map second word-extents) right)
-       start (-> word-extents first first)
-       end (-> num dec word-extents second)
-       section (subs text start (- end start))
-       width (pf/string-width font-key section)
-       diff (- right width)
-       num-spaces (count (re-seq #" " section))
-       padding (/ diff num-spaces)
-       line (pf/make-char-sprite-set font-key text 0x000000)
-       ]
-   section
 
-))
+(defn make-text [font-key text x y right line-spacing charset]
+  (let [font (pf/get-font font-key)
+        height (:height font)
+        word-extents (vec (pf/word-beginnings-ends text))
+        num (pf/how-many-words-fit font-key text (map second word-extents) right)
+        start (-> word-extents first first)
+        end (-> num dec word-extents second)
+        section (subs text start (- end start))
+        width (pf/string-width font-key section)
+        diff (- right width)
+        num-spaces (count (re-seq #" " section))
+        more? (< num (count word-extents))
+        padding (if more? (/ diff num-spaces) 0)
+        line (pf/make-char-sprite-set font-key section :tint 0xffffff :x 0 :y y :space-padding padding)]
+    (if more?
+      (make-text font-key (subs text (-> num word-extents first))
+                 x (+ y (* line-spacing height))
+                 right line-spacing (into charset line))
+      (into charset line))))
+
+
+(defonce run-later
+  (go
+    (<! (timeout 2000))
+    (m/with-sprite :ui
+      [example (s/make-container
+                (make-text :small "This is some sample text that goes on and on and needs to wrap like the quick brown fox, who allegedly, jumped over the lazy dog!" 0 0 200 1.2 [])
+                :scale 2)]
+      (<! (timeout 10000))
+      )
+    ))
