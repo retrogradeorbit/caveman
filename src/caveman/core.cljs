@@ -761,7 +761,8 @@ void main() {
     ))
 
 
-(defn make-text [font-key text x y right line-spacing charset]
+(defn make-text [font-key text x y right line-spacing justify charset]
+  (assert (#{:justified :ragged} justified) "justify needs to be set correctly")
   (let [font (pf/get-font font-key)
         height (:height font)
         word-extents (vec (pf/word-beginnings-ends text))
@@ -774,11 +775,15 @@ void main() {
         num-spaces (count (re-seq #" " section))
         more? (< num (count word-extents))
         padding (if more? (/ diff num-spaces) 0)
-        line (pf/make-char-sprite-set font-key section :tint 0xffffff :x 0 :y y :space-padding padding)]
+        line (pf/make-char-sprite-set font-key section
+                                      :tint 0xffffff
+                                      :x 0 :y y
+                                      :space-padding (if (= :justify justify) padding 0))]
     (if more?
       (make-text font-key (subs text (-> num word-extents first))
                  x (+ y (* line-spacing height))
-                 right line-spacing (into charset line))
+                 right line-spacing justify
+                 (into charset line))
       (into charset line))))
 
 
