@@ -649,6 +649,7 @@ void main() {
                             )
                           )
 
+
                         :think
                         (when (= :think mode)
                           (swap! state
@@ -769,7 +770,7 @@ void main() {
     (<! (timeout 2000))
     (m/with-sprite :ui
       [example (s/make-container
-                (pf/layout-text :small "This is some sample text that goes on and on and needs to wrap like the quick brown fox, who allegedly, jumped over the lazy dog!" 0 0 200 1.2 :justify [])
+                (pf/layout-text :small "This is some sample text that goes on and on and needs to wrap like the quick brown fox, who allegedly, jumped over the lazy dog!" :right 200)
                 :scale 2)]
       (<! (timeout 10000))
       )
