@@ -177,7 +177,8 @@
                       :yhandle 0
                       :mousedown mousedown
                       :scale 1))
-          window (s/make-container children :xhandle xhandle :yhandle yhandle
+          window (s/make-container :children children
+                                   :xhandle xhandle :yhandle yhandle
                                    :scale 4
                                    ;:tint 0x000000
                                    :visible true
@@ -474,8 +475,7 @@ void main() {
               (:empty tileset)
               2000 2000)
           level (make-field)
-          level-batch (js/PIXI.Container.) ;; ParticleContainer cant have filters applies
-
+          level-batch (s/make-container)
           state (atom nil)
           ]
       (loop []
@@ -496,8 +496,7 @@ void main() {
         (add-tiles! level-batch tileset level)
 
         (let [player (s/make-sprite :grave)
-              player-batch (js/PIXI.Container.)
-
+              player-batch (s/make-container)
               dark-filter-level (lightmap-filter
                                  (r/get-texture :light)
                                  #js  [0 0 0 0.5]
@@ -542,7 +541,7 @@ void main() {
                               (recur (dec f)))))
                         )
 
-              inventions (js/PIXI.Container.)]
+              inventions (s/make-container)]
           (.addChild player-batch player)
           (m/with-sprite :inventions
             [inventions inventions]
@@ -770,6 +769,7 @@ void main() {
     (<! (timeout 2000))
     (m/with-sprite :ui
       [example (s/make-container
+                :children
                 (pf/layout-text :small "This is some sample text that goes on and on and needs to wrap like the quick brown fox, who allegedly, jumped over the lazy dog!" :right 200)
                 :scale 2)]
       (<! (timeout 10000))
